@@ -8,7 +8,7 @@ import phue
 
 class MainWindow(Gtk.Window):
     def __init__(self, bridge):
-        super().__init__(title="Philips Hue", default_width=400, default_height=400)
+        super(MainWindow, self).__init__(title="Philips Hue", default_width=400, default_height=400)
 
         self.bridge = bridge
 
@@ -93,7 +93,7 @@ class MainWindow(Gtk.Window):
 
 class LightWidget(Gtk.Grid):
     def __init__(self, window, id):
-        super().__init__(halign=Gtk.Align.FILL, column_homogeneous=False)
+        super(LightWidget, self).__init__(halign=Gtk.Align.FILL, column_homogeneous=False)
         self.window = window
         self.set_light = functools.partial(window.set_light, int(id))
         self.id = id
