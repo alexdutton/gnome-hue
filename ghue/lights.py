@@ -22,8 +22,12 @@ class LightsPage(Gtk.ScrolledWindow):
 
     def light_added(self, id, light_state):
         light_widget = LightWidget(self, id)
-        self.vbox.pack_end(light_widget, False, False, 5)
+        self.vbox.pack_start(light_widget, False, False, 5)
         self.light_widgets[id] = light_widget
+        sorted_lights = sorted(self.light_widgets.values(),
+                               key=lambda lw : lw.state['name'])
+        self.vbox.reorder_child(light_widget,
+                                sorted_lights.index(light_widget))
 
     def light_changed(self, id, state, changed):
         self.light_widgets[id].light_changed(state, changed)
