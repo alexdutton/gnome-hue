@@ -7,6 +7,7 @@ import jsonpointer
 import phue
 
 from .lights import LightsPage
+from .schedules import SchedulesPage
 
 class MainWindow(Gtk.ApplicationWindow):
     def __init__(self, bridge):
@@ -42,7 +43,12 @@ class MainWindow(Gtk.ApplicationWindow):
         self.notebook.append_page(self.lights_page,
                                   Gtk.Label(label='Lights'))
 
-        self.state = {'lights': {}}
+        self.schedules_page = SchedulesPage(self)
+        self.notebook.append_page(self.schedules_page,
+                                  Gtk.Label(label='Schedules'))
+
+        self.state = {'lights': {},
+                      'schedules': {}}
         self.refresh_from_api()
 
     def refresh_from_api(self, *args):
@@ -61,6 +67,18 @@ class MainWindow(Gtk.ApplicationWindow):
                     changed.add(k)
             if changed:
                 self.lights_page.light_changed(id, self.state['lights'][id]['state'], changed)
+
+        for id in set(self.state['schedules']) - set(last_state['schedules']):
+            self.schedules_page.schedule_added(id, self.state['schedules'][id])
+        for id in set(last_state['schedules']) - set(self.state['schedules']):
+            self.schedules_page.schedule_removed(id, last_state['schedules'][id])
+        for id in set(self.state['schedules']) & set(last_state['schedules']):
+            for k in self.state['schedules'][id]:
+                if self.state['schedules'][id][k] != last_state['schedules'][id].get(k):
+                    changed.add(k)
+            if changed:
+                self.schedules_page.schedule_changed(id, self.state['schedules'][id], changed)
+
 
     def all_off(self, *args):
         phue.AllLights(self.bridge).on = False
