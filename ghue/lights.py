@@ -3,48 +3,26 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
-import jsonpointer
-import phue
 
-class MainWindow(Gtk.Window):
-    def __init__(self, bridge):
-        super(MainWindow, self).__init__(title="Philips Hue", default_width=400, default_height=400)
+class LightsPage(Gtk.ScrolledWindow):
+    def __init__(self, window):
+        super(LightsPage, self).__init__(hscrollbar_policy=Gtk.PolicyType.NEVER)
+        self.window = window
+        self.set_light = window.set_light
+        scrolled__window = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER)
+        self.vbox = Gtk.VBox(border_width=5)
+        scrolled__window.add(self.vbox)
+        self.add(scrolled__window)
 
-        self.bridge = bridge
-
-        self.header_bar = Gtk.HeaderBar(title="Philips Hue")
-        self.header_bar.set_show_close_button(True)
-        self.set_titlebar(self.header_bar)
-
-        self.rediscover_button = Gtk.Button(tooltip_text="Discover new lights")
-        self.rediscover_button.connect('clicked', self.refresh_from_api)
-        icon = Gio.ThemedIcon(name="gtk-refresh")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        self.rediscover_button.add(image)
-        self.header_bar.pack_end(self.rediscover_button)
-
-        self.all_off_button = Gtk.Button(tooltip_text="Turn off all lights")
-        self.all_off_button.connect('clicked', self.all_off)
-        icon = Gio.ThemedIcon(name="gtk-stop")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        self.all_off_button.add(image)
-        self.header_bar.pack_end(self.all_off_button)
-
-        self.notebook = Gtk.Notebook()
-        self.add(self.notebook)
-
-        lights_window = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER)
-        self.lights_vbox = Gtk.VBox(border_width=5)
-        lights_window.add(self.lights_vbox)
-        self.notebook.append_page(lights_window, Gtk.Label(label='Lights'))
-
-        self.state = {'lights': {}}
         self.light_widgets = {}
-        self.refresh_from_api()
+
+    @property
+    def state(self):
+        return self.window.state['lights']
 
     def light_added(self, id, light_state):
         light_widget = LightWidget(self, id)
-        self.lights_vbox.pack_end(light_widget, False, False, 5)
+        self.vbox.pack_end(light_widget, False, False, 5)
         self.light_widgets[id] = light_widget
 
     def light_changed(self, id, state, changed):
@@ -52,50 +30,14 @@ class MainWindow(Gtk.Window):
 
     def light_removed(self, id, last_light_state):
         light_widget = self.light_widgets.pop(id)
-        self.lights_vbox.remove(light_widget)
-
-    def refresh_from_api(self, *args):
-        last_state = self.state
-        self.state = self.bridge.get_api()
-        for id in set(self.state['lights']) - set(last_state['lights']):
-            self.light_added(id, self.state['lights'][id])
-        for id in set(last_state['lights']) - set(self.state['lights']):
-            self.light_removed(id, last_state['lights'][id])
-        for id in set(self.state['lights']) & set(last_state['lights']):
-            if self.state['lights'][id]['name'] != last_state['lights'][id]['name']:
-                self.light_name_changed(id, self.state['lights'][id]['name'])
-            changed = set()
-            for k in self.state['lights'][id]['state']:
-                if self.state['lights'][id]['state'][k] != last_state['lights'][id]['state'].get(k):
-                    changed.add(k)
-            if changed:
-                self.light_changed(id, self.state['lights'][id]['state'], changed)
-
-    def all_off(self, *args):
-        phue.AllLights(self.bridge).on = False
-        for id in self.state:
-            if self.state['lights'][id]['state']['on']:
-                self.state['lights'][id]['state']['on'] = False
-                self.light_changed(id, self.state['lights'][id]['state'], {'on'})
-
-    def set_light(self, *args, **kwargs):
-        results = self.bridge.set_light(*args, **kwargs)[0]
-        for result in results:
-            if 'success' in result:
-                k, v = result['success'].popitem()
-                jsonpointer.set_pointer(self.state, k, v)
-
-
-# class LightsPage(Gtk.ScrolledWindow):
-#     def __init__(self, window):
-#         self.window = window
-
+        self.vbox.remove(light_widget)
 
 class LightWidget(Gtk.Grid):
-    def __init__(self, window, id):
+    def __init__(self, lights_page, id):
         super(LightWidget, self).__init__(halign=Gtk.Align.FILL, column_homogeneous=False)
-        self.window = window
-        self.set_light = functools.partial(window.set_light, int(id))
+
+        self.lights_page = lights_page
+        self.set_light = functools.partial(lights_page.set_light, int(id))
         self.id = id
 
         self.label = Gtk.Label(label=self.state['name'], xalign=0, halign=Gtk.Align.FILL, hexpand=True)
@@ -120,7 +62,7 @@ class LightWidget(Gtk.Grid):
 
     @property
     def state(self):
-        return self.window.state['lights'][self.id]
+        return self.lights_page.state[self.id]
 
     def on_select_color(self, *args, **kwargs):
         popover = Gtk.Popover()
@@ -173,10 +115,3 @@ class LightWidget(Gtk.Grid):
     def on_sat_changed(self, scale):
         value = int(scale.get_value())
         self.set_light({'sat': value})
-
-bridge = phue.Bridge('philips-hue.local')
-
-win = MainWindow(bridge)
-win.connect('delete-event', Gtk.main_quit)
-win.show_all()
-Gtk.main()
