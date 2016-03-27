@@ -5,4 +5,5 @@ setup(
     version='0.1',
     license='GPL',
     packages=find_packages(),
+    scripts=['bin/gnome-hue'],
 )
