@@ -8,9 +8,12 @@ import phue
 
 from .lights import LightsPage
 
-class MainWindow(Gtk.Window):
+class MainWindow(Gtk.ApplicationWindow):
     def __init__(self, bridge):
-        super(MainWindow, self).__init__(title="Philips Hue", default_width=400, default_height=400)
+        super(MainWindow, self).__init__(title="Philips Hue",
+                                         default_width=400,
+                                         default_height=400,
+                                         type=Gtk.WindowType.TOPLEVEL)
 
         self.bridge = bridge
 
