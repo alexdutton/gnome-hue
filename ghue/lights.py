@@ -45,7 +45,7 @@ class LightWidget(Gtk.Grid):
 
         self.brightness = Gtk.HScale(halign=Gtk.Align.FILL, hexpand=True, adjustment=Gtk.Adjustment(lower=0, upper=254, step_increment=1),
                                      draw_value=False)
-        self.brightness.set_value(self.state['state']['bri'])
+        self.brightness.set_value(self.state['state']['bri'] if self.state['state']['on'] else 0)
         self.brightness.connect('value-changed', self.on_brightness_changed)
         self.attach(self.brightness, 0, 1, 3 if 'hue' in self.state['state'] else 2, 1)
 
