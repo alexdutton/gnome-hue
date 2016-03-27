@@ -10,7 +10,7 @@ class LightsPage(Gtk.ScrolledWindow):
         self.window = window
         self.set_light = window.set_light
         scrolled__window = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER)
-        self.vbox = Gtk.VBox(border_width=5)
+        self.vbox = Gtk.VBox(valign=Gtk.Align.START, border_width=5)
         scrolled__window.add(self.vbox)
         self.add(scrolled__window)
 
