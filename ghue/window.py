@@ -82,10 +82,10 @@ class MainWindow(Gtk.ApplicationWindow):
 
     def all_off(self, *args):
         phue.AllLights(self.bridge).on = False
-        for id in self.state:
+        for id in self.state['lights']:
             if self.state['lights'][id]['state']['on']:
                 self.state['lights'][id]['state']['on'] = False
-                self.light_changed(id, self.state['lights'][id]['state'], {'on'})
+                self.lights_page.light_changed(id, self.state['lights'][id]['state'], {'on'})
 
     def set_light(self, *args, **kwargs):
         results = self.bridge.set_light(*args, **kwargs)[0]
