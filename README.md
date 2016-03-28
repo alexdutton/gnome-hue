@@ -12,5 +12,5 @@ Requires the [phue](https://github.com/studioimaginaire/phue) library, and [json
 
 Simply:
 
-    $ python3 ghue.py
+    $ python -m ghue
 
