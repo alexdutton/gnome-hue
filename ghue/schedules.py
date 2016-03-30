@@ -7,8 +7,7 @@ class SchedulesPage(Gtk.ScrolledWindow):
         self.window = window
         scrolled__window = Gtk.ScrolledWindow(hscrollbar_policy=Gtk.PolicyType.NEVER)
         self.vbox = Gtk.VBox(valign=Gtk.Align.START, border_width=5)
-        scrolled__window.add(self.vbox)
-        self.add(scrolled__window)
+        self.add(self.vbox)
 
         self.widgets = {}
 
