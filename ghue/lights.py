@@ -12,7 +12,6 @@ class LightsPage(WidgetPage):
     notebook_label = 'Lights'
 
     def get_widget(self, device):
-        print(device, isinstance(device, Light))
         if isinstance(device, Light):
             return LightWidget(device)
 

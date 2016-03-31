@@ -53,7 +53,6 @@ class HueDeviceManager(DeviceManager):
     def set_light(self, *args, **kwargs):
         results = self._bridge.set_light(*args, **kwargs)[0]
         state = copy.deepcopy(self._state)
-        print(results)
         for result in results:
             if 'success' in result:
                 k, v = result['success'].popitem()

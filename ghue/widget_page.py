@@ -32,10 +32,8 @@ class WidgetPage(six.with_metaclass(WidgetPageMeta, Gtk.ScrolledWindow)):
         return None
 
     def on_device_added(self, controller, device):
-        print("ADDED", controller, device)
         widget = self.get_widget(device)
         if widget:
-            print("YAY")
             self.vbox.add(widget)
             self.vbox.show_all()
             #self.vbox.pack_start(widget, False, False, 5)
