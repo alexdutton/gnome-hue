@@ -11,7 +11,9 @@ class WidgetPageMeta(GObjectMeta, abc.ABCMeta):
 class WidgetPage(six.with_metaclass(WidgetPageMeta, Gtk.ScrolledWindow)):
     def __init__(self, controller):
         super(WidgetPage, self).__init__(hscrollbar_policy=Gtk.PolicyType.NEVER)
-        self.vbox = Gtk.VBox(valign=Gtk.Align.START, border_width=5)
+        self.vbox = Gtk.Box(valign=Gtk.Align.START,
+                            orientation=Gtk.Orientation.VERTICAL,
+                            border_width=5)
         self.add(self.vbox)
 
         self.widgets = {}

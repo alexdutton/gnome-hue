@@ -56,7 +56,7 @@ class LightWidget(Gtk.Grid):
         sat_scale.set_value(self.device.saturation)
         sat_scale.connect('value-changed', self.on_sat_changed)
 
-        vbox = Gtk.VBox()
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         vbox.pack_start(Gtk.Label(label="Hue"), False, False, 0)
         vbox.pack_start(hue_scale, False, False, 0)
         vbox.pack_start(Gtk.Label(label="Saturation"), False, False, 0)
