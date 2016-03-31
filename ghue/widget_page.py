@@ -33,9 +33,8 @@ class WidgetPage(six.with_metaclass(WidgetPageMeta, Gtk.ScrolledWindow)):
     def on_device_added(self, controller, device):
         widget = self.get_widget(device)
         if widget:
-            self.vbox.add(widget)
+            self.vbox.pack_start(widget, False, False, 5)
             self.vbox.show_all()
-            #self.vbox.pack_start(widget, False, False, 5)
             self.widgets[device] = widget
             self.resort_device(device)
             device.connect('device-removed', self.on_device_removed)
