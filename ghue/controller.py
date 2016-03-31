@@ -7,7 +7,6 @@ from ghue.device_manager import DeviceManager
 class Controller(GObject.GObject):
     __gsignals__ = {
         'device-added': (GObject.SIGNAL_RUN_FIRST, None, (Device,)),
-        'device-removed': (GObject.SIGNAL_RUN_FIRST, None, (Device,)),
         'device-manager-added': (GObject.SIGNAL_RUN_FIRST, None, (DeviceManager,)),
         'device-manager-removed': (GObject.SIGNAL_RUN_FIRST, None, (DeviceManager,)),
     }

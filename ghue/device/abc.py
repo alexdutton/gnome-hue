@@ -13,7 +13,8 @@ class DeviceMeta(GObjectMeta, abc.ABCMeta):
 
 class Device(six.with_metaclass(DeviceMeta, GObject.GObject)):
     __gsignals__ = {
-        'device-changed': (GObject.SIGNAL_RUN_FIRST, None, (object,))
+        'device-changed': (GObject.SIGNAL_RUN_FIRST, None, (object,)),
+        'device-removed': (GObject.SIGNAL_RUN_FIRST, None, ()),
     }
 
     @property
