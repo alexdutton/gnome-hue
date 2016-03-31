@@ -122,7 +122,7 @@ class DimmableHueLight(Dimmable, HueLight):
     pass
 
 
-class ColorableHueLight(Colorable, HueLight):
+class ColorableHueLight(Colorable, DimmableHueLight):
     pass
 
 
