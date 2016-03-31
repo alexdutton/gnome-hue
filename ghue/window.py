@@ -45,6 +45,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.schedules_page = SchedulesPage(self.controller)
         self.schedules_page.add_to_notebook(self.notebook)
 
+        self.controller.refresh_state()
+
     def all_off(self, *args):
         phue.AllLights(self.bridge).on = False
         for id in self.state['lights']:
