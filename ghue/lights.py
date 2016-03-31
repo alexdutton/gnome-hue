@@ -21,6 +21,7 @@ class LightWidget(Gtk.Grid):
         super(LightWidget, self).__init__(halign=Gtk.Align.FILL, column_homogeneous=False)
 
         self.device = device
+        self.device.connect('device-changed', self.on_device_changed)
 
         self.label = Gtk.Label(label=device.get('name'), xalign=0, halign=Gtk.Align.FILL, hexpand=True)
         self.attach(self.label, 0, 0, 1, 1)
@@ -56,16 +57,25 @@ class LightWidget(Gtk.Grid):
         sat_scale.set_value(self.device.saturation)
         sat_scale.connect('value-changed', self.on_sat_changed)
 
+        hsv = Gtk.HSV()
+        hsv.set_color(self.device.hue / 65536. if self.device.on else 0,
+                      self.device.saturation / 256.,
+                      self.device.brightness / 256.)
+        hsv.set_metrics(150, 15)
+        hsv.connect('changed', self.on_hsv_changed)
+
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox.pack_start(Gtk.Label(label="Hue"), False, False, 0)
-        vbox.pack_start(hue_scale, False, False, 0)
-        vbox.pack_start(Gtk.Label(label="Saturation"), False, False, 0)
-        vbox.pack_start(sat_scale, False, False, 0)
+        # vbox.pack_start(Gtk.Label(label="Hue"), False, False, 0)
+        # vbox.pack_start(hue_scale, False, False, 0)
+        # vbox.pack_start(Gtk.Label(label="Saturation"), False, False, 0)
+        # vbox.pack_start(sat_scale, False, False, 0)
+        vbox.pack_start(hsv, False, False, 0)
         popover.add(vbox)
         popover.show_all()
 
-    def light_changed(self, device, changed):
-        if {'bri', 'on'} & changed:
+    def on_device_changed(self, device, changed):
+        print(changed)
+        if {'brightness', 'on'} & changed:
             self.brightness.set_value(device.brightness if device.on else 0)
         if 'reachable' in changed:
             self.reachable.set_from_icon_name('' if device.reachable else 'error', Gtk.IconSize.BUTTON)
@@ -91,3 +101,13 @@ class LightWidget(Gtk.Grid):
     def on_sat_changed(self, scale):
         value = int(scale.get_value())
         self.device.set({'saturation': value})
+
+    def on_hsv_changed(self, hsv):
+        h, s, v = hsv.get_color()
+        if v == 0:
+            self.device.set({'on': False})
+        else:
+            self.device.set({'hue': int(h * 65536),
+                             'saturation': int(s * 256),
+                             'brightness': int(v * 256),
+                             'on': True})
