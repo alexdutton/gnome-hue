@@ -74,7 +74,6 @@ class LightWidget(Gtk.Grid):
         popover.show_all()
 
     def on_device_changed(self, device, changed):
-        print(changed)
         if {'brightness', 'on'} & changed:
             self.brightness.set_value(device.brightness if device.on else 0)
         if 'reachable' in changed:
